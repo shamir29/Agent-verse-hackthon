@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WasteFlow AI — Autonomous Multi-Agent Waste Management Platform</title>
+  <meta name="description" content="Enterprise multi-agent smart city waste management platform for monitoring smart bins, predicting overflow, optimizing routes, detecting illegal dumping, classifying waste with AI vision, and tracking carbon reduction.">
+
+  <!-- Font & CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Leaflet Map Engine CSS & JS CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div id="app">
+
+    <!-- Top Header Navigation -->
+    <header class="top-header">
+      <div class="brand-section">
+        <div class="brand-logo">W</div>
+        <div>
+          <div class="brand-title">WasteFlow AI</div>
+          <div class="agent-badge-online">
+            <span class="status-dot pulse-dot"></span>
+            11 AI AGENTS ONLINE
+          </div>
+        </div>
+      </div>
+
+      <!-- Global Search Input -->
+      <div class="header-search">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input type="text" id="global-search-input" placeholder="Search Bin ID, Vehicle, Route, Area, Landfill, Alert...">
+        <span class="search-shortcut">⌘K</span>
+      </div>
+
+      <!-- Header Actions -->
+      <div class="header-actions">
+        <button class="icon-btn" onclick="window.WasteFlowApp.toggleAgentStatusModal()" title="AI Agent Status">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+        </button>
+
+        <button class="icon-btn" onclick="window.WasteFlowApp.toggleNotificationsDrawer()" title="Smart Notifications">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+          </svg>
+          <span class="notification-count">4</span>
+        </button>
+
+        <div class="user-profile">
+          <div class="avatar">SO</div>
+          <div class="user-info">
+            <span class="user-name">Smart City Director</span>
+            <span class="user-role">Municipal Ops Desk</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div class="nav-section-title">Operations</div>
+      <a class="nav-item active" data-view="dashboard">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" data-view="map">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+        City Waste Map
+      </a>
+      <a class="nav-item" data-view="bins">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        Smart Bins
+        <span class="nav-badge danger">3 Urgent</span>
+      </a>
+      <a class="nav-item" data-view="fleet">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        Collection Fleet
+      </a>
+      <a class="nav-item" data-view="route">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg>
+        Route Optimization
+      </a>
+
+      <div class="nav-section-title">AI Intelligence</div>
+      <a class="nav-item" data-view="prediction">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        Waste Prediction
+      </a>
+      <a class="nav-item" data-view="dumping">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Illegal Dumping
+        <span class="nav-badge danger">1 Alert</span>
+      </a>
+      <a class="nav-item" data-view="assistant">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        AI Assistant
+      </a>
+      <a class="nav-item" data-view="agents">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/></svg>
+        Autonomous AI Agents
+      </a>
+
+      <div class="nav-section-title">Facilities & Impact</div>
+      <a class="nav-item" data-view="recycling">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        Recycling Centers
+      </a>
+      <a class="nav-item" data-view="landfills">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg>
+        Landfills
+      </a>
+      <a class="nav-item" data-view="carbon">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Carbon Analytics
+      </a>
+      <a class="nav-item" data-view="reports">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Reports
+      </a>
+      <a class="nav-item" data-view="settings">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </a>
+    </aside>
+
+    <!-- Main Content Workspace -->
+    <main class="main-content">
+
+      <!-- 1. DASHBOARD VIEW -->
+      <section id="view-dashboard" class="view-panel active">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Smart City Operations Dashboard</h1>
+            <p class="page-subtitle">Real-time multi-agent waste telemetry & predictive dispatch overview</p>
+          </div>
+          <div class="header-buttons">
+            <button onclick="window.WasteFlowRouter.generateOptimization(); window.WasteFlowApp.showView('route');" class="btn btn-primary">Run AI Route Dispatch</button>
+          </div>
+        </div>
+
+        <!-- 8 Top KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">Active Smart Bins</span>
+              <div class="kpi-icon green">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value">1,240</div>
+            <div class="kpi-footer"><span class="kpi-trend-up">99.2% Online</span> <span class="kpi-subtext">Telemetry active</span></div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">Overflow Risk</span>
+              <div class="kpi-icon danger">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value">3 Bins</div>
+            <div class="kpi-footer"><span class="kpi-trend-down">Critical Threshold</span> <span class="kpi-subtext">Pickup queued</span></div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">Collections Today</span>
+              <div class="kpi-icon blue">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value">1,482</div>
+            <div class="kpi-footer"><span class="kpi-trend-up">↑ 12%</span> <span class="kpi-subtext">vs yesterday</span></div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">Recycling Rate</span>
+              <div class="kpi-icon green">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value">54.2%</div>
+            <div class="kpi-footer"><span class="kpi-trend-up">↑ 3.8%</span> <span class="kpi-subtext">Target: 60%</span></div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">Waste Generated</span>
+              <div class="kpi-icon warning">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6l3 18h12l3-18H3z"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value">148.4 T</div>
+            <div class="kpi-footer"><span class="kpi-trend-down">Normal range</span> <span class="kpi-subtext">Daily volume</span></div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">Carbon Saved</span>
+              <div class="kpi-icon green">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value">14.8 MT</div>
+            <div class="kpi-footer"><span class="kpi-trend-up">↑ 18.2%</span> <span class="kpi-subtext">CO₂ offset</span></div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">Fleet Efficiency</span>
+              <div class="kpi-icon blue">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value">94.6%</div>
+            <div class="kpi-footer"><span class="kpi-trend-up">Optimal</span> <span class="kpi-subtext">Route score</span></div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">Citizen Complaints</span>
+              <div class="kpi-icon warning">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value">2</div>
+            <div class="kpi-footer"><span class="kpi-trend-up">↓ 80%</span> <span class="kpi-subtext">Resolved in 15m</span></div>
+          </div>
+        </div>
+
+        <!-- Dashboard Main Grid -->
+        <div class="grid-3-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Live City Telemetry Map</div>
+              <button onclick="window.WasteFlowApp.showView('map')" class="btn btn-secondary btn-sm">Full Screen Map</button>
+            </div>
+            <div id="mini-map" class="map-frame" style="height:360px;"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">AI Agent Decision Stream</div>
+              <span class="badge badge-success">LIVE TICK</span>
+            </div>
+            <div id="agents-stream-box" style="display:flex; flex-direction:column; gap:12px;">
+              <div class="alert-item info">
+                <div class="alert-title">Smart Bin Monitoring Agent</div>
+                <div style="font-size:12px; color:#4B5563;">Flagged BIN-101 (5th Ave) fill level reaching 92%.</div>
+                <div class="alert-time">10 seconds ago</div>
+              </div>
+              <div class="alert-item warning">
+                <div class="alert-title">Overflow Prediction Agent</div>
+                <div style="font-size:12px; color:#4B5563;">Predicted BIN-106 overflow in 2.4 hours based on traffic model.</div>
+                <div class="alert-time">45 seconds ago</div>
+              </div>
+              <div class="alert-item danger">
+                <div class="alert-title">Illegal Dumping Agent</div>
+                <div style="font-size:12px; color:#4B5563;">CCTV camera #14 detected construction debris at Pier 54.</div>
+                <div class="alert-time">2 mins ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. CITY MAP VIEW -->
+      <section id="view-map" class="view-panel">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Interactive City Waste Map</h1>
+            <p class="page-subtitle">Real-time geospatial tracking for smart bins, haulers, recycling hubs & landfills</p>
+          </div>
+          <div class="header-buttons">
+            <button onclick="window.WasteFlowApp.triggerSimulatedNewRequest()" class="btn btn-primary">+ Simulate New Request</button>
+          </div>
+        </div>
+        <div class="card" style="height: calc(100vh - 180px); min-height: 550px; width: 100%; padding:0; overflow:hidden;">
+          <div id="main-map" class="map-frame" style="height: 100%; width: 100%;"></div>
+        </div>
+      </section>
+
+      <!-- 3. SMART BINS VIEW -->
+      <section id="view-bins" class="view-panel">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Smart Waste Bins Monitoring</h1>
+            <p class="page-subtitle">Live IoT sensor telemetry (fill %, temp, methane gas, battery level)</p>
+          </div>
+          <div class="header-buttons" style="display:flex; align-items:center; gap:12px;">
+            <button id="auto-dispatch-toggle-btn" onclick="window.WasteFlowApp.toggleAutoDispatch()" class="btn btn-primary" style="background-color:#16A34A; border-color:#16A34A;">
+              🤖 Auto-Dispatch AI: ACTIVE
+            </button>
+            <button onclick="window.WasteFlowApp.autoDispatchAllCritical()" class="btn btn-secondary">
+              Dispatch All Critical Bins
+            </button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>BIN ID</th>
+                <th>LOCATION</th>
+                <th>WASTE TYPE</th>
+                <th>FILL LEVEL</th>
+                <th>METHANE</th>
+                <th>TEMP / HUMIDITY</th>
+                <th>BATTERY</th>
+                <th>OVERFLOW RISK</th>
+                <th>PRIORITY</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody id="bins-table-body">
+              <!-- Dynamically rendered -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 4. COLLECTION FLEET VIEW -->
+      <section id="view-fleet" class="view-panel">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Collection Fleet Management</h1>
+            <p class="page-subtitle">Electric and heavy waste vehicle tracking, battery/fuel status, and capacity load</p>
+          </div>
+        </div>
+        <div id="fleet-cards-container" class="grid-3">
+          <!-- Dynamically rendered -->
+        </div>
+      </section>
+
+      <!-- 5. ROUTE OPTIMIZATION VIEW -->
+      <section id="view-route" class="view-panel">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>AI Route Optimization Agent</h1>
+            <p class="page-subtitle">Autonomous Traveling Salesperson Problem (TSP) solver taking traffic & priorities into account</p>
+          </div>
+          <div class="header-buttons" style="display:flex; align-items:center; gap:12px;">
+            <select id="route-truck-select" onchange="window.WasteFlowRouter.generateOptimization()" style="padding:8px 12px; border:1px solid #E5E7EB; border-radius:6px; font-size:13px; font-weight:600;">
+              <option value="TRUCK-01">TRUCK-01 (Marina Beach & Mylapore)</option>
+              <option value="TRUCK-02">TRUCK-02 (T. Nagar & Anna Nagar)</option>
+              <option value="TRUCK-03">TRUCK-03 (OMR IT Expressway & Velachery)</option>
+              <option value="TRUCK-04">TRUCK-04 (Tambaram & Guindy Industrial)</option>
+            </select>
+            <button onclick="window.WasteFlowRouter.generateOptimization()" class="btn btn-primary">Recalculate Optimal Routes</button>
+          </div>
+        </div>
+
+        <div class="grid-3-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Generated Driver Waypoint Route</div>
+              <span class="badge badge-success">ROUTE OPTIMAL</span>
+            </div>
+            <div id="opt-waypoints-list">
+              <!-- Dynamically rendered waypoints -->
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Optimization Savings & Impact</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid #E5E7EB; padding-bottom:8px;">
+                <span>Shortest Route Distance:</span> <strong id="opt-distance">14.2 km</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid #E5E7EB; padding-bottom:8px;">
+                <span>Estimated Fuel Savings:</span> <strong id="opt-fuel" style="color:#16A34A;">$18.40</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid #E5E7EB; padding-bottom:8px;">
+                <span>Time Saved:</span> <strong id="opt-time">22 mins</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid #E5E7EB; padding-bottom:8px;">
+                <span>CO₂ Emissions Saved:</span> <strong id="opt-co2" style="color:#16A34A;">14.8 kg</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between;">
+                <span>Estimated Driver Arrival (ETA):</span> <strong id="opt-eta">10:45 AM</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. WASTE PREDICTION VIEW -->
+      <section id="view-prediction" class="view-panel">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Overflow Prediction Agent</h1>
+            <p class="page-subtitle">LSTM neural network forecasting 1h, 6h, 12h, and 7-day municipal bin overflow risks</p>
+          </div>
+        </div>
+
+        <div class="card" style="height:380px;">
+          <div class="card-header">
+            <div class="card-title">24-Hour Predictive Bin Overflow Curve</div>
+            <span class="badge badge-info">CONFIDENCE 97.8%</span>
+          </div>
+          <div style="height:300px; position:relative;">
+            <canvas id="pred-chart-canvas"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. ILLEGAL DUMPING VIEW -->
+      <section id="view-dumping" class="view-panel">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Illegal Dumping Detection Agent</h1>
+            <p class="page-subtitle">Automated CCTV and drone video analytics detecting unauthorized waste dumping in public zones</p>
+          </div>
+        </div>
+        <div id="dumping-events-container" style="display:flex; flex-direction:column; gap:16px;">
+          <!-- Dynamically rendered -->
+        </div>
+      </section>
+
+      <!-- 9. RECYCLING CENTERS VIEW -->
+      <section id="view-recycling" class="view-panel">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Recycling Center Monitoring</h1>
+            <p class="page-subtitle">Facility processing throughput, reject contamination rates, and recovered material revenue</p>
+          </div>
+        </div>
+        <div id="recycling-grid-container" class="grid-3" style="margin-bottom:20px;">
+          <!-- Dynamically rendered -->
+        </div>
+        <div class="card" style="height:320px;">
+          <div class="card-header">
+            <div class="card-title">Recovered Material Distribution</div>
+          </div>
+          <div style="height:240px; position:relative;">
+            <canvas id="recycling-doughnut-canvas"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10. LANDFILLS VIEW -->
+      <section id="view-landfills" class="view-panel">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Landfill Health & Risk Management</h1>
+            <p class="page-subtitle">Methane gas emissions monitoring, leachate levels, air quality index, and closure forecasts</p>
+          </div>
+        </div>
+        <div id="landfills-grid-container" class="grid-2">
+          <!-- Dynamically rendered -->
+        </div>
+      </section>
+
+      <!-- 11. CARBON ANALYTICS VIEW -->
+      <section id="view-carbon" class="view-panel">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Carbon & Sustainability Analytics</h1>
+            <p class="page-subtitle">Quantifying municipal greenhouse gas emissions prevented through smart collection and recycling</p>
+          </div>
+        </div>
+
+        <div class="card" style="height:380px;">
+          <div class="card-header">
+            <div class="card-title">Monthly CO₂ Emissions Diverted (Metric Tons)</div>
+          </div>
+          <div style="height:300px; position:relative;">
+            <canvas id="carbon-chart-canvas"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- 12. REPORTS VIEW -->
+      <section id="view-reports" class="view-panel">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Municipal Waste Operations Reports</h1>
+            <p class="page-subtitle">Audit-grade report generation for smart city sustainability directors and fleet managers</p>
+          </div>
+          <div class="header-buttons">
+            <button onclick="window.WasteFlowReports.exportCSV()" class="btn btn-secondary">Export CSV Data</button>
+            <button onclick="window.print()" class="btn btn-primary">Print PDF Report</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div style="display:flex; gap:16px; align-items:center;">
+            <label style="font-size:13px; font-weight:600;">Report Type:</label>
+            <select id="report-type-select" onchange="window.WasteFlowReports.generateReport()" style="padding:8px 12px; border:1px solid #E5E7EB; border-radius:6px; font-size:13px;">
+              <option value="daily">Daily Collection Audit</option>
+              <option value="overflow">Smart Bin Overflow Risk Audit</option>
+              <option value="carbon">Carbon Sustainability Audit</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="report-output-container">
+          <!-- Dynamically generated report document -->
+        </div>
+      </section>
+
+      <!-- 13. AI ASSISTANT VIEW -->
+      <section id="view-assistant" class="view-panel">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>WasteFlow Operations AI Copilot</h1>
+            <p class="page-subtitle">Natural language operations query assistant for municipal controllers</p>
+          </div>
+        </div>
+
+        <div class="chat-container">
+          <div id="chat-messages" class="chat-messages">
+            <div class="chat-bubble bot">
+              Hello! I am your <strong>WasteFlow Operations Copilot</strong>. I am connected to all 11 autonomous multi-agent microservices in real time. Ask me anything about bin overflow risks, fleet routes, or illegal dumping alerts.
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Type a message, e.g. 'Which bins need urgent collection?'...">
+            <button onclick="window.WasteFlowAssistant.sendMessage()" class="btn btn-primary">Send</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 14. AUTONOMOUS AI AGENTS VIEW -->
+      <section id="view-agents" class="view-panel">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Autonomous AI Agent Network</h1>
+            <p class="page-subtitle">Real-time status, confidence score, inference latency, and health of 11 dedicated AI microservices</p>
+          </div>
+        </div>
+        <div id="agents-grid-container" class="grid-3">
+          <!-- Dynamically rendered -->
+        </div>
+      </section>
+
+      <!-- 15. SETTINGS VIEW -->
+      <section id="view-settings" class="view-panel">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Platform System Settings</h1>
+            <p class="page-subtitle">Telemetry polling rates, sensor thresholds, and WebSocket simulation parameters</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size:16px; font-weight:600; margin-bottom:16px;">Sensor Alert Thresholds</h3>
+          <div style="display:flex; flex-direction:column; gap:16px; max-width:480px;">
+            <div>
+              <label style="font-size:13px; font-weight:500;">Critical Bin Fill Trigger (%)</label>
+              <input type="number" value="90" style="width:100%; padding:8px; border:1px solid #E5E7EB; border-radius:6px; margin-top:4px;">
+            </div>
+            <div>
+              <label style="font-size:13px; font-weight:500;">Methane Leak Threshold (ppm)</label>
+              <input type="number" value="500" style="width:100%; padding:8px; border:1px solid #E5E7EB; border-radius:6px; margin-top:4px;">
+            </div>
+            <div>
+              <label style="font-size:13px; font-weight:500;">Telemetry Stream Rate (ms)</label>
+              <input type="number" value="3500" style="width:100%; padding:8px; border:1px solid #E5E7EB; border-radius:6px; margin-top:4px;">
+            </div>
+            <div style="margin-top:8px;">
+              <button onclick="alert('System configuration parameters saved successfully.')" class="btn btn-primary">Save Settings</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- Toast Notification Overlay Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Notification Drawer -->
+  <div id="notification-drawer" class="drawer">
+    <div class="drawer-header">
+      <h3 style="font-size:16px; font-weight:700;">Smart Alert Notifications</h3>
+      <button onclick="window.WasteFlowApp.toggleNotificationsDrawer()" class="close-btn">&times;</button>
+    </div>
+    <div class="drawer-body">
+      <div class="alert-item danger">
+        <div class="alert-title">Critical Overflow Risk</div>
+        <div style="font-size:12px; color:#4B5563;">BIN-109 (SoHo Grand) reached 97% fill level. Methane elevated at 38 ppm.</div>
+        <div class="alert-time">2 mins ago</div>
+      </div>
+      <div class="alert-item danger">
+        <div class="alert-title">Illegal Dumping Alert</div>
+        <div style="font-size:12px; color:#4B5563;">CCTV camera #14 detected hazardous waste containers at Pier 54 loading dock.</div>
+        <div class="alert-time">12 mins ago</div>
+      </div>
+      <div class="alert-item warning">
+        <div class="alert-title">Vehicle Maintenance Warning</div>
+        <div style="font-size:12px; color:#4B5563;">TRUCK-04 (BYD 8R Heavy Collector) battery health dropped below 75%. Service due.</div>
+        <div class="alert-time">45 mins ago</div>
+      </div>
+      <div class="alert-item info">
+        <div class="alert-title">AI Route Optimization</div>
+        <div style="font-size:12px; color:#4B5563;">TRUCK-01 rerouted via 10th Ave, avoiding 18 min traffic delay.</div>
+        <div class="alert-time">1 hr ago</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent Status Modal -->
+  <div id="agent-status-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">Autonomous AI Microservices Status</div>
+        <button onclick="window.WasteFlowApp.toggleAgentStatusModal()" class="close-btn">&times;</button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border:1px solid #E5E7EB; border-radius:6px;">
+          <div><strong>11 Microservices Active</strong></div>
+          <span class="badge badge-success">Average Latency: 32ms</span>
+        </div>
+        <p style="font-size:13px; color:#6B7280;">All multi-agent neural models (YOLOv11, LSTM Overflow Predictor, TSP Optimizer, Gas Chromatography Auditor) are online and synchronized with WebSocket stream.</p>
+        <button onclick="window.WasteFlowApp.showView('agents'); window.WasteFlowApp.toggleAgentStatusModal();" class="btn btn-primary" style="margin-top:12px;">View Full Agent Diagnostics</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Application Entry Modules -->
+  <script src="js/config.js"></script>
+  <script src="js/mapEngine.js"></script>
+  <script src="js/agentsEngine.js"></script>
+  <script src="js/chartsEngine.js"></script>
+  <script src="js/routeOptimizer.js"></script>
+  <script src="js/reportsGenerator.js"></script>
+  <script src="js/aiAssistant.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
