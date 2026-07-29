@@ -1,0 +1,117 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Substation {
+  id            String   @id @default(cuid())
+  name          String
+  zone          String
+  status        String   // "operational" | "warning" | "critical"
+  loadPercent   Float
+  voltageKv     Float
+  lat           Float
+  lng           Float
+  updatedAt     DateTime @updatedAt
+}
+
+model Reservoir {
+  id            String   @id @default(cuid())
+  name          String
+  levelPercent  Float
+  capacityMl    Float
+  lat           Float
+  lng           Float
+  updatedAt     DateTime @updatedAt
+}
+
+model Alert {
+  id            String   @id @default(cuid())
+  title         String
+  category      String   // "power" | "water" | "air_quality" | "healthcare" | "maintenance" | "weather"
+  severity      String   // "critical" | "high" | "medium" | "low"
+  status        String   // "open" | "assigned" | "resolved"
+  location      String
+  assignedTeam  String?
+  createdAt     DateTime @default(now())
+  resolvedAt    DateTime?
+}
+
+model SolarArray {
+  id                String   @id @default(cuid())
+  name              String
+  zone              String
+  capacityKw        Float
+  generationKw      Float
+  efficiencyPercent Float
+  tiltAngleDeg      Int      @default(30)
+  status            String   // "optimal" | "maintenance" | "degraded"
+  updatedAt         DateTime @updatedAt
+}
+
+model WasteZone {
+  id               String   @id @default(cuid())
+  zoneName         String
+  binCount         Int
+  fillLevelPercent Float
+  status           String   // "normal" | "warning" | "overflow_risk"
+  lastCollected    DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model AirQualitySensor {
+  id          String   @id @default(cuid())
+  location    String
+  aqi         Int
+  pm25        Float
+  pm10        Float
+  co2         Float
+  status      String   // "good" | "moderate" | "unhealthy"
+  updatedAt   DateTime @updatedAt
+}
+
+model EVStation {
+  id                String   @id @default(cuid())
+  name              String
+  location          String
+  totalChargers     Int
+  chargersAvailable Int
+  powerKw           Float
+  status            String   // "active" | "busy" | "maintenance"
+  updatedAt         DateTime @updatedAt
+}
+
+model HospitalNode {
+  id                String   @id @default(cuid())
+  name              String
+  location          String
+  totalBeds         Int
+  occupiedBeds      Int
+  emergencyQueue    Int
+  icuAvailable      Int
+  status            String   // "normal" | "busy" | "critical"
+  updatedAt         DateTime @updatedAt
+}
+
+model UserRecord {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  role         String   // "Administrator" | "Grid Dispatcher" | "Water Ops" | "Safety Analyst"
+  department   String
+  status       String   // "active" | "inactive"
+  createdAt    DateTime @default(now())
+}
+
+model SystemIntegration {
+  id           String   @id @default(cuid())
+  name         String
+  category     String   // "Grid Telemetry" | "SCADA Link" | "Weather Radar" | "IoT Gateway"
+  status       String   // "connected" | "degraded" | "disconnected"
+  latencyMs    Int
+  lastSync     DateTime @default(now())
+}
